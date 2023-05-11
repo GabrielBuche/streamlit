@@ -1,1 +1,27 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-8d59dc4de5201274e310e4c54b9627a8934c3b88527886e3b421487c677d23eb.svg)](https://classroom.github.com/a/Nit1XD_J)
+## Para baixar poetry na maquina
+pip install poetry
+
+## Para baixar os pacotes
+poetry install
+
+## Verificar versão do poetry 
+poetry -v
+
+## Na raiz do projeto execute para rodar a aplicação
+poetry run streamlit run app.py
+
+
+## Para executar sem o poetry baixe os pacotes necessarias
+## baixe o streamlit
+pip install streamlit
+
+## todar com streamlit sem o poetry
+streamlit run app.py
+
+## Para adicionar pacote como dependencia do poetry
+poetry add "Nome do pacote"
+
+# execute logo em seguida
+poetry install
+
+# para atualizar os pacotes do poetry
