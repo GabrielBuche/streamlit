@@ -3,7 +3,20 @@ import requests
 import pandas as pd
 import streamlit as st
 
+import re
+
+from geopy.geocoders import Nominatim
+
+def get_address(latitude, longitude):
+    geolocator = Nominatim(user_agent="my-geocode-addres")
+    location = geolocator.reverse(f"{latitude}, {longitude}")
+    if location is not None:
+        return location.address
+    else:
+        return None
+
 def pegarDadosBuche():
+    regex = r'q=(-?\d+\.\d+),(-?\d+\.\d+)'
     url = "https://imobiliariaperez.com.br/alugar" # site para extrair
     response = requests.get(url) #request html
     soup = BeautifulSoup(response.content, 'html.parser') #configurao beautifulsoup
@@ -24,6 +37,17 @@ def pegarDadosBuche():
         value = newSoup.find('h2', class_= "elementor-heading-title").get_text() 
         description = newSoup.find_all('p')[3].get_text()
         arrayInfo =  newSoup.find_all('div', class_= "col-6")
+        div_element = newSoup.find('div', class_="elementor-custom-embed")
+
+        if div_element:
+            iframe_element = div_element.find('iframe') 
+            if iframe_element and 'src' in iframe_element.attrs:
+                iframe_src = iframe_element['src']  
+                match = re.search(regex, iframe_src)
+                if match:
+                    latitude = match.group(1)
+                    longitude = match.group(2)  
+
 
         valueArea = arrayInfo[-1].text
 
@@ -34,7 +58,9 @@ def pegarDadosBuche():
 
         title = titleA.split()[0]   
 
-        aux = [title, value, area.strip(), description]
+        endereco = get_address(latitude, longitude)
+
+        aux = [title, value, endereco, area.strip(), description, latitude, longitude]
         myInfoArray.append(aux)
 
         
@@ -42,7 +68,7 @@ def pegarDadosBuche():
         my_bar.progress(progress_percent, text=progress_text)     
         progress += 1
     
-    df = pd.DataFrame(myInfoArray, columns=['Título', 'Aluguel', 'Área', 'Descrição'])
+    df = pd.DataFrame(myInfoArray, columns=['Título', 'Aluguel', 'Endereco', 'Área', 'Descrição', 'Latitude', 'Longitude'])
     return df
 
 def gerarCsv(df):
